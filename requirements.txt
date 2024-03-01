@@ -1,0 +1,8 @@
+torch
+transformers>=4.8.1
+nltk>=3.6.6
+huggingface-hub
+sentencepiece
+protobuf
+stanza
+tqdm
