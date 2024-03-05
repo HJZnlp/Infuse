@@ -5,27 +5,51 @@ import numpy as np
 from itertools import zip_longest
 import argparse
 from tqdm import tqdm
+import stanza
+
+def get_sents(c, seg_tokenizer):
+    doc =seg_tokenizer(c)
+    sents=[sentence.text for sentence in doc.sentences ]
+    return sents
+
+
+# segment doc and summ into nested
+def seg_raw_data(docs, sums):
+    seg_tokenizer = stanza.Pipeline(lang="en", processors='tokenize')
+    if len(docs)!=len(sums):
+            print("unmatch no of samples.")
+            print(f"doc:{len(docs)} sum: {len(sums)}")
+            exit()
+    print(f"load {len(docs)} pairs")
+
+    doc_sents,summ_sents=[],[]
+
+    for doc, summ in zip(docs,sums):
+        doc_sents.append(get_sents(doc,seg_tokenizer))
+        summ_sents.append(get_sents(summ,seg_tokenizer))
+
+    return doc_sents,summ_sents
 
 
 def load_data(doc_name, sum_name):
     # Read documents; split into lists by empty lines.
     with open(doc_name, 'r') as fdoc:
-        doc_content = fdoc.read().strip()  # Remove leading/trailing whitespace
-        # Split content by two newlines, then split each document by newlines
-        docc = [doc.split('\n') for doc in doc_content.split('\n\n')]
+        doc_content = fdoc.read().strip()
+        docs = [doc.split('\n') for doc in doc_content.split('\n\n')]
 
-    # Read summaries; split into lists by empty lines.
     with open(sum_name, 'r') as fsum:
-        sum_content = fsum.read().strip()  # Remove leading/trailing whitespace
-        # Split content by two newlines, then split each summary by newlines
-        summ = [summary.split('\n') for summary in sum_content.split('\n\n')]
-    if len(docc)!=len(summ):
-            print("unmatch no of samples.")
-            print(f"doc:{len(docc)} sum: {len(summ)}")
-            exit()
-    print(f"load {len(docc)} pairs")
+        sum_content = fsum.read().strip()
+        sums = [summary.split('\n') for summary in sum_content.split('\n\n')]
 
-    return docc, summ
+    if len(docs)!=len(sums):
+            print("unmatch no of samples.")
+            print(f"doc:{len(docs)} sum: {len(sums)}")
+            exit()
+    print(f"load {len(docs)} pairs")
+
+    return docs, sums
+
+
 def grouped(iterable, n):
     return zip_longest(*[iter(iterable)] * n)
 
@@ -85,7 +109,6 @@ class INFUSE:
         return {idx: [doc2sum_scores[idx], sum2doc_scores[idx]] for idx in idx_doc2sum}
 
 
-
     def build_premise(self,candidate_dict, doc_sentences, super_K, rev):
         sorted_candidates = sorted(
             candidate_dict.items(),
@@ -93,6 +116,7 @@ class INFUSE:
             reverse=True
         )
         return "".join(doc_sentences[idx] for idx, _ in sorted(sorted_candidates[:super_K], key=lambda item: item[0]))
+
 
     def evaluate_batch_premises(self,premise_list, sentence):
         hypotheses = [sentence] * len(premise_list)
@@ -109,9 +133,15 @@ class INFUSE:
                 best_neu_score = score_neu
                 best_ent_score = batch_ent[i]
 
-    def process_document_summary(self, doc, summ, rev):
+
+    def process_document_summary(self, doc_path, summ_path, rev, seg):
+        if seg:
+            doc,summ=seg_raw_data(doc_path,summ_path)
+        else:
+            doc,summ=load_data(doc_path,summ_path)
+
         scorer = []
-        # for ind,c in tqdm(enumerate(summ),total=len(summ)):
+
         for ind, summary_sentences in tqdm(enumerate(summ),total=len(summ) ):
             sample_score=[]
             doc_sentences = doc[ind]
@@ -124,7 +154,7 @@ class INFUSE:
 
                 doc2sum_res, sum2doc_res = self.obtain_matrices(doc_sentences, summary_sentence)
 
-                # break_outer_loop = False
+
                 for super_K_range in generate_ranges(len(doc_sentences)):
                     premise_list=[]
                     if sentence_score >0:
@@ -136,7 +166,7 @@ class INFUSE:
 
                     batch_ent, batch_neu = self.evaluate_batch_premises(premise_list, summary_sentence)
 
-                    # self.update_scores(batch_ent, batch_neu, best_neu_score, best_ent_score, sentence_score)
+
                     for i, score_neu in enumerate(batch_neu):
                         if score_neu > best_neu_score:
                             sentence_score=best_ent_score
@@ -159,18 +189,19 @@ if __name__ == "__main__":
     parser.add_argument("--input_sum", type=str, default='test')
     parser.add_argument("--save_address", type=str, default='test')
     parser.add_argument("--reverse", type=int,default=1)
+    parser.add_argument("--seg", type=int,default=0)
     parser.add_argument("--model_name", type=str,default="tals/albert-xlarge-vitaminc-mnli")
     args = parser.parse_args()
     doc_path=args.input_doc.strip()
     sum_path=args.input_sum.strip()
     out_path=args.save_address.strip()
-    rev=args.reverse
+    rev=args.reverse.strip()
+    seg=args.seg.strip()
     model_name=args.model_name.strip()
-    
-    doc,summ=load_data(doc_path,sum_path)
+
     model=INFUSE(model_name)
 
-    scorer=model.process_document_summary(doc,summ,rev)
+    scorer=model.process_document_summary(doc_path,sum_path,rev,seg)
 
 
     print("done")
