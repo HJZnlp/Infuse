@@ -9,6 +9,8 @@ INFUSE is a faithfulness evaluation approach that **IN**crementally reasons over
 ## Quickstart
 
 ```bash
+git clone https://github.com/HJZnlp/Infuse.git
+cd Infuse
 pip install -r requirements.txt
 ```
 
@@ -16,6 +18,7 @@ pip install -r requirements.txt
 ### Direct use
 
 ```
+from src.infuse import INFUSE
 
 documents=["document_a","document_b"......]
 summaries=["summary_a","summary_b"......]
@@ -33,7 +36,7 @@ scorer=model.process_document_summary(documents,summaries,require_segmentation)
 doc_path = YOUR_DOCUMENT_PATH
 sum_path = YOUR_SUMMARY_PATH
 outpath = YOUR_OUTPUT_PATH
-python infuse.py --input_doc $doc_path --input_sum $sum_path --save_address $outpath
+python src/infuse.py --input_doc $doc_path --input_sum $sum_path --save_address $outpath
 ```
 
 Ensure that the document and summary are preprocessed to meet the following format criteria before running the script:
