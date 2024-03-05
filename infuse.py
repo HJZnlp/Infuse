@@ -195,8 +195,8 @@ if __name__ == "__main__":
     doc_path=args.input_doc.strip()
     sum_path=args.input_sum.strip()
     out_path=args.save_address.strip()
-    rev=args.reverse.strip()
-    seg=args.seg.strip()
+    rev=args.reverse
+    seg=args.seg
     model_name=args.model_name.strip()
 
     model=INFUSE(model_name)
