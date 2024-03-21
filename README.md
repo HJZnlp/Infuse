@@ -4,7 +4,7 @@ This repository contains the code and data for EACL2024 paper: Fine-Grained Natu
 
 INFUSE is a faithfulness evaluation approach that **IN**crementally reasons over a document so as to arrive at a **F**aithf**u**lnes**s** **E**stimation of its summary. This repository contains the implementation of INFUSE, as well as **Diversumm**, a faithfulness evaluation benchmark on long document summarisation with diverse domains and genres and multi-document summarisation.
 
-
+Should you have any queries please contact me at v1hzha17@ed.ac.uk
 
 ## Quickstart
 
