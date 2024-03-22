@@ -49,10 +49,16 @@ Note: Replace YOUR_DOCUMENT_PATH, YOUR_SUMMARY_PATH, and YOUR_OUTPUT_PATH with t
 
 ## Citation
 ```
-@misc{zhang2024finegrained,
-      title={Fine-Grained Natural Language Inference Based Faithfulness Evaluation for Diverse Summarisation Tasks}, 
-      author={Huajian Zhang and Yumo Xu and Laura Perez-Beltrachini},
-      year={2024},
-      eprint={2402.17630},
+@inproceedings{zhang-etal-2024-fine,
+    title = "Fine-Grained Natural Language Inference Based Faithfulness Evaluation for Diverse Summarisation Tasks",
+    author = "Zhang, Huajian  and
+      Xu, Yumo  and
+      Perez-Beltrachini, Laura",
+    booktitle = "Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = mar,
+    year = "2024",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.eacl-long.102",
+    pages = "1701--1722",
 }
 ```
