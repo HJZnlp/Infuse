@@ -23,10 +23,11 @@ from src.infuse import INFUSE
 documents=["document_a","document_b"......]
 summaries=["summary_a","summary_b"......]
 require_segmentation=1
+require_reverse=1
 
 model=INFUSE(YOUR_NLI_MODEL_NAME)
 
-scorer=model.process_document_summary(documents,summaries,require_segmentation)
+scorer=model.process_document_summary(documents,summaries,require_reverse,require_segmentation)
 # scorer will return a nest list of scores for each summary sentence
 
 ```
